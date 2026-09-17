@@ -1,47 +1,472 @@
-DOCTYPE ht
-<    <div class="auth-divider"><span>or</span></div>
-    <button id="google-auth-btn" class="btn btn-secondary btn-block">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.8 2.73v2.27h2.92c1.71-1.57 2.68-3.88 2.68-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.72c-.18-.54-.28-1.11-.28-1.72s.1-1.18.28-1.72V4.94H.96A8.996 8.996 0 000 9c0 1.45.35 2.83.96 4.06l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.94l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
-      Continue with Google
-    </button>
-    <button id="guest-auth-btn" class="btn btn-ghost btn-block">Continue as guest</button>
-    <p class="auth-error" id="auth-error"></p>
-  </div>
-</section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ============ APP SHELL ============ -->
-<div id="app-shell" class="app-shell hidden">
+<title>CoinTap - Earn Coins</title>
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-mark small"><span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span><span class="bar b5"></span></div>
-      <span class="brand-name">CreatorStudio</span>
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f3f6fb;
+    color:#172033;
+}
+
+.container{
+    max-width:430px;
+    margin:auto;
+    min-height:100vh;
+}
+
+.header{
+    background:linear-gradient(135deg,#172554,#2563eb);
+    color:white;
+    padding:25px 20px 30px;
+    border-radius:0 0 30px 30px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:25px;
+    font-weight:bold;
+}
+
+.logoCoin{
+    width:42px;
+    height:42px;
+    background:#fbbf24;
+    color:#172554;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.profile{
+    font-size:25px;
+}
+
+.balanceTitle{
+    margin-top:25px;
+    font-size:13px;
+    opacity:.8;
+}
+
+.balance{
+    font-size:45px;
+    font-weight:bold;
+    margin-top:3px;
+}
+
+.money{
+    font-size:14px;
+    opacity:.85;
+}
+
+.content{
+    padding:20px;
+}
+
+.heading{
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:12px;
+    margin-top:5px;
+}
+
+.card{
+    background:white;
+    padding:16px;
+    border-radius:20px;
+    margin-bottom:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+.row{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.icon{
+    width:52px;
+    height:52px;
+    background:#eef4ff;
+    border-radius:15px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:26px;
+}
+
+.info{
+    flex:1;
+}
+
+.title{
+    font-size:16px;
+    font-weight:bold;
+}
+
+.small{
+    font-size:12px;
+    color:#6b7280;
+    margin-top:5px;
+}
+
+button{
+    border:none;
+    background:#2563eb;
+    color:white;
+    padding:11px 15px;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+.games{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.game{
+    background:white;
+    padding:15px;
+    border-radius:18px;
+    box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+.gameIcon{
+    font-size:30px;
+}
+
+.gameTitle{
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.reward{
+    color:#2563eb;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.fullButton{
+    width:100%;
+    margin-top:12px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.stat{
+    background:#f8fafc;
+    padding:15px;
+    text-align:center;
+    border-radius:15px;
+}
+
+.statNumber{
+    display:block;
+    font-size:23px;
+    font-weight:bold;
+}
+
+.footer{
+    text-align:center;
+    color:#7b8494;
+    font-size:11px;
+    line-height:1.5;
+    padding:5px 10px 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="top">
+
+            <div class="logo">
+                <div class="logoCoin">C</div>
+                CoinTap
+            </div>
+
+            <div class="profile">👤</div>
+
+        </div>
+
+        <div class="balanceTitle">
+            YOUR COIN BALANCE
+        </div>
+
+        <div class="balance" id="coins">
+            0
+        </div>
+
+        <div class="money">
+            100 Coins = ₹1
+        </div>
+
     </div>
 
-    <nav class="side-nav">
-      <p class="nav-group-label">Studio</p>
-      <button class="nav-item active" data-view="dashboard"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z"/></svg><span>Dashboard</span></button>
-      <button class="nav-item" data-view="history"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3z"/><path d="M12 8v5l4 2 .75-1.23-3.25-1.77V8z"/></svg><span>History</span></button>
-      <button class="nav-item" data-view="trending"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg><span>Trending</span></button>
 
-      <p class="nav-group-label">AI Tools</p>
-      <button class="nav-item" data-view="tool-thumb-gen"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>Thumbnail Generator</span></button>
-      <button class="nav-item" data-view="tool-thumb-analyze"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.49 19l-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg><span>Thumbnail Analyzer</span></button>
-      <button class="nav-item" data-view="tool-title"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg><span>Title Generator</span></button>
-      <button class="nav-item" data-view="tool-description"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h12v2H3z"/></svg><span>Description Generator</span></button>
-      <button class="nav-item" data-view="tool-tags"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .53.21 1.04.59 1.41l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.83zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z"/></svg><span>Tags Generator</span></button>
-      <button class="nav-item" data-view="tool-script"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z"/></svg><span>Script Generator</span></button>
-      <button class="nav-item" data-view="tool-caption"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 9h12v2H6zm0-3h12v2H6zm0 6h8v2H6z"/></svg><span>Caption Generator</span></button>
-    </nav>
+    <div class="content">
 
-    <div class="sidebar-footer">
-      <button class="nav-item" data-view="settings"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94L14.4 2.81a.5.5 0 0 0-.5-.41h-3.84a.5.5 0 0 0-.5.41l-.36 2.54a7.3 7.3 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.66 8.86a.5.5 0 0 0 .12.64l2.03 1.58c-.05.3-.08.61-.08.94s.02.64.07.94l-2.03 1.59a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.4.32.6.22l2.39-.96c.5.4 1.04.72 1.63.94l.36 2.54c.05.28.27.41.5.41h3.84c.25 0 .46-.13.5-.41l.36-2.54c.6-.22 1.14-.55 1.63-.94l2.39.96c.24.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64zM12 15.6A3.6 3.6 0 1 1 15.6 12 3.6 3.6 0 0 1 12 15.6z"/></svg><span>Settings</span></button>
-      <div class="user-chip" id="user-chip">
-        <div class="avatar" id="user-avatar">U</div>
-        <div class="user-chip-meta">
-          <span class="user-name" id="user-name-label">Guest</span>
-          <span class="user-plan">Free plan</span>
+        <div class="heading">
+            Earn Coins
         </div>
-        <button class="icon-btn" id="logout-btn" title="Sign out">
-          <svg viewBox="0 
+
+
+        <div class="card">
+
+            <div class="row">
+
+                <div class="icon">
+                    📺
+                </div>
+
+                <div class="info">
+
+                    <div class="title">
+                        Watch an Ad
+                    </div>
+
+                    <div class="small">
+                        Watch an advertisement and earn coins.
+                    </div>
+
+                </div>
+
+                <button onclick="watchAd()">
+                    +1
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="heading">
+            Games & Offers
+        </div>
+
+
+        <div class="games">
+
+            <div class="game">
+
+                <div class="gameIcon">
+                    🎮
+                </div>
+
+                <div class="gameTitle">
+                    Play & Earn
+                </div>
+
+                <div class="reward">
+                    +50 Coins
+                </div>
+
+                <button class="fullButton" onclick="playGame()">
+                    PLAY
+                </button>
+
+            </div>
+
+
+            <div class="game">
+
+                <div class="gameIcon">
+                    🎁
+                </div>
+
+                <div class="gameTitle">
+                    Daily Bonus
+                </div>
+
+                <div class="reward">
+                    +10 Coins
+                </div>
+
+                <button class="fullButton" onclick="dailyBonus()">
+                    CLAIM
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="heading" style="margin-top:22px;">
+            Your Activity
+        </div>
+
+
+        <div class="card stats">
+
+            <div class="stat">
+
+                <span class="statNumber" id="ads">
+                    0
+                </span>
+
+                <span class="small">
+                    Ads Watched
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <span class="statNumber" id="earned">
+                    0
+                </span>
+
+                <span class="small">
+                    Coins Earned
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="row">
+
+                <div class="icon">
+                    💰
+                </div>
+
+                <div class="info">
+
+                    <div class="title">
+                        Redeem Coins
+                    </div>
+
+                    <div class="small">
+                        Redeem feature will be connected later.
+                    </div>
+
+                </div>
+
+                <button onclick="redeem()">
+                    VIEW
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer">
+
+            CoinTap is currently a demo.
+            Coins shown on this page are not real money.
+            Real advertisements, offers and withdrawals
+            will require the appropriate services and rules.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let coins = 0;
+let ads = 0;
+let earned = 0;
+
+function update(){
+
+    document.getElementById("coins").innerText = coins;
+
+    document.getElementById("ads").innerText = ads;
+
+    document.getElementById("earned").innerText = earned;
+
+}
+
+
+function watchAd(){
+
+    coins = coins + 1;
+
+    earned = earned + 1;
+
+    ads = ads + 1;
+
+    update();
+
+    alert("Demo Ad Reward: +1 Coin");
+
+}
+
+
+function dailyBonus(){
+
+    coins = coins + 10;
+
+    earned = earned + 10;
+
+    update();
+
+    alert("Daily Bonus: +10 Coins");
+
+}
+
+
+function playGame(){
+
+    coins = coins + 50;
+
+    earned = earned + 50;
+
+    update();
+
+    alert("Demo Game Reward: +50 Coins");
+
+}
+
+
+function redeem(){
+
+    alert("Redeem system will be added later.");
+
+}
+
+update();
+
+</script>
+
+</body>
+</html>
