@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>CreatorStudio AI — Your AI Content Co-Pilot</title>
+<meta name="description" content="CreatorStudio AI — generate thumbnails, titles, descriptions, tags, scripts and captions with AI. Built for creators." />
+<meta name="theme-color" content="#0B0E14" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ============ SPLASH / LOADER ============ -->
+<div id="app-loader" class="app-loader">
+  <div class="loader-mark">
+    <span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span><span class="bar b5"></span>
+  </div>
+  <p class="loader-text">Warming up the studio…</p>
+</div>
+
+<!-- ============ TOAST CONTAINER ============ -->
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<!-- ============ AUTH SCREEN ============ -->
+<section id="auth-screen" class="auth-screen hidden">
+  <div class="auth-bg-glow"></div>
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark"><span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span><span class="bar b5"></span></div>
+      <h1>CreatorStudio <em>AI</em></h1>
+      <p class="auth-tagline">One console. Every asset your next upload needs.</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth-tab="login">Sign in</button>
+      <button class="auth-tab" data-auth-tab="signup">Create account</button>
+    </div>
+
+    <form id="login-form" class="auth-form active">
+      <label class="field-label" for="login-email">Email</label>
+      <input class="field-input" type="email" id="login-email" placeholder="you@studio.com" required autocomplete="email" />
+      <label class="field-label" for="login-password">Password</label>
+      <input class="field-input" type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" minlength="6" />
+      <button type="submit" class="btn btn-primary btn-block" id="login-submit">Sign in</button>
+      <button type="button" class="btn btn-ghost btn-block" id="forgot-password-btn">Forgot password?</button>
+    </form>
+
+    <form id="signup-form" class="auth-form">
+      <label class="field-label" for="signup-name">Name</label>
+      <input class="field-input" type="text" id="signup-name" placeholder="Your name" required autocomplete="name" />
+      <label class="field-label" for="signup-email">Email</label>
+      <input class="field-input" type="email" id="signup-email" placeholder="you@studio.com" required autocomplete="email" />
+      <label class="field-label" for="signup-password">Password</label>
+      <input class="field-input" type="password" id="signup-password" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6" />
+      <button type="submit" class="btn btn-primary btn-block" id="signup-submit">Create account</button>
+    </form>
+
+    <div class="auth-divider"><span>or</span></div>
+    <button id="google-auth-btn" class="btn btn-secondary btn-block">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.8 2.73v2.27h2.92c1.71-1.57 2.68-3.88 2.68-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.72c-.18-.54-.28-1.11-.28-1.72s.1-1.18.28-1.72V4.94H.96A8.996 8.996 0 000 9c0 1.45.35 2.83.96 4.06l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.94l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <button id="guest-auth-btn" class="btn btn-ghost btn-block">Continue as guest</button>
+    <p class="auth-error" id="auth-error"></p>
+  </div>
+</section>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell" class="app-shell hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark small"><span class="bar b1"></span><span class="bar b2"></span><span class="bar b3"></span><span class="bar b4"></span><span class="bar b5"></span></div>
+      <span class="brand-name">CreatorStudio</span>
+    </div>
+
+    <nav class="side-nav">
+      <p class="nav-group-label">Studio</p>
+      <button class="nav-item active" data-view="dashboard"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z"/></svg><span>Dashboard</span></button>
+      <button class="nav-item" data-view="history"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 2.05 4.95l-1.42 1.42A9 9 0 1 0 13 3z"/><path d="M12 8v5l4 2 .75-1.23-3.25-1.77V8z"/></svg><span>History</span></button>
+      <button class="nav-item" data-view="trending"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg><span>Trending</span></button>
+
+      <p class="nav-group-label">AI Tools</p>
+      <button class="nav-item" data-view="tool-thumb-gen"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>Thumbnail Generator</span></button>
+      <button class="nav-item" data-view="tool-thumb-analyze"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.49 19l-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg><span>Thumbnail Analyzer</span></button>
+      <button class="nav-item" data-view="tool-title"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg><span>Title Generator</span></button>
+      <button class="nav-item" data-view="tool-description"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h12v2H3z"/></svg><span>Description Generator</span></button>
+      <button class="nav-item" data-view="tool-tags"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .53.21 1.04.59 1.41l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.83zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z"/></svg><span>Tags Generator</span></button>
+      <button class="nav-item" data-view="tool-script"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z"/></svg><span>Script Generator</span></button>
+      <button class="nav-item" data-view="tool-caption"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 9h12v2H6zm0-3h12v2H6zm0 6h8v2H6z"/></svg><span>Caption Generator</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="nav-item" data-view="settings"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94L14.4 2.81a.5.5 0 0 0-.5-.41h-3.84a.5.5 0 0 0-.5.41l-.36 2.54a7.3 7.3 0 0 0-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.66 8.86a.5.5 0 0 0 .12.64l2.03 1.58c-.05.3-.08.61-.08.94s.02.64.07.94l-2.03 1.59a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.4.32.6.22l2.39-.96c.5.4 1.04.72 1.63.94l.36 2.54c.05.28.27.41.5.41h3.84c.25 0 .46-.13.5-.41l.36-2.54c.6-.22 1.14-.55 1.63-.94l2.39.96c.24.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64zM12 15.6A3.6 3.6 0 1 1 15.6 12 3.6 3.6 0 0 1 12 15.6z"/></svg><span>Settings</span></button>
+      <div class="user-chip" id="user-chip">
+        <div class="avatar" id="user-avatar">U</div>
+        <div class="user-chip-meta">
+          <span class="user-name" id="user-name-label">Guest</span>
+          <span class="user-plan">Free plan</span>
+        </div>
+        <button class="icon-btn" id="logout-btn" title="Sign out">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10a1 1 0 0 0-1 1v4h2V5h8v14h-8v-3H9v4a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile nav overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main -->
+  <main class="main-area">
+    <header class="topbar">
+      <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" width="22" height="22"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      </button>
+      <h2 class="topbar-title" id="topbar-title">Dashboard</h2>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="theme-toggle-btn" title="Toggle theme">
+          <svg id="theme-icon-dark" viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+          <svg id="theme-icon-light" viewBox="0 0 24 24" width="20" height="20" class="hidden"><path d="M12 7a5 5 0 1 0 5 5 5 5 0 0 0-5-5zM2 13h2v-2H2zm18 0h2v-2h-2zM11 2v2h2V2zm0 18v2h2v-2zM4.22 5.64l1.42-1.42 1.41 1.41-1.41 1.42zm12.73 12.73 1.41 1.41 1.42-1.41-1.42-1.42zM17.24 4.63l1.41-1.42 1.42 1.42-1.42 1.41zM4.22 18.36l1.42 1.41 1.41-1.41-1.41-1.42z"/></svg>
+        </button>
+        <div class="avatar small" id="topbar-avatar">U</div>
+      </div>
+    </header>
+
+    <div class="view-scroll" id="view-scroll">
+
+      <!-- DASHBOARD VIEW -->
+      <section class="view active" id="view-dashboard">
+        <div class="hero-panel">
+          <div class="hero-text">
+            <p class="eyebrow">Studio overview</p>
+            <h1>Hey <span id="hero-username">there</span>, what are we creating today?</h1>
+            <p class="hero-sub">Every asset for your next upload — thumbnail, title, description, tags, script and captions — generated in one console.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Assets created</span></div>
+            <div class="stat-card"><span class="stat-num" id="stat-week">0</span><span class="stat-label">This week</span></div>
+            <div class="stat-card"><span class="stat-num" id="stat-streak">0</span><span class="stat-label">Day streak</span></div>
+          </div>
+        </div>
+
+        <h3 class="section-heading">AI Tools</h3>
+        <div class="tool-grid">
+          <button class="tool-card" data-view="tool-thumb-gen" style="--accent:#7C5CFF">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>
+            <h4>Thumbnail Generator</h4><p>AI-designed, high-CTR thumbnail concepts from a prompt.</p>
+          </button>
+          <button class="tool-card" data-view="tool-thumb-analyze" style="--accent:#2DD4BF">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.49 19l-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg></div>
+            <h4>Thumbnail Analyzer</h4><p>Upload a thumbnail, get a CTR score and fixes.</p>
+          </button>
+          <button class="tool-card" data-view="tool-title" style="--accent:#FFB454">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg></div>
+            <h4>Title Generator</h4><p>Scroll-stopping titles tuned to your topic and tone.</p>
+          </button>
+          <button class="tool-card" data-view="tool-description" style="--accent:#5CA8FF">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h12v2H3z"/></svg></div>
+            <h4>Description Generator</h4><p>SEO-ready descriptions with timestamps &amp; links.</p>
+          </button>
+          <button class="tool-card" data-view="tool-tags" style="--accent:#FF6B9D">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7c0 .53.21 1.04.59 1.41l9 9a2 2 0 0 0 2.82 0l7-7a2 2 0 0 0 0-2.83zM6.5 8A1.5 1.5 0 1 1 8 6.5 1.5 1.5 0 0 1 6.5 8z"/></svg></div>
+            <h4>Tags Generator</h4><p>Discovery-optimized tags, ready to paste in.</p>
+          </button>
+          <button class="tool-card" data-view="tool-script" style="--accent:#9B7CFF">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm2 16H8v-2h8zm0-4H8v-2h8zm-3-5V3.5L18.5 9z"/></svg></div>
+            <h4>Script Generator</h4><p>Full video scripts with hooks, beats and a CTA.</p>
+          </button>
+          <button class="tool-card" data-view="tool-caption" style="--accent:#4ADE80">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM6 9h12v2H6zm0-3h12v2H6zm0 6h8v2H6z"/></svg></div>
+            <h4>Caption Generator</h4><p>Platform-perfect social captions with hashtags.</p>
+          </button>
+          <button class="tool-card" data-view="trending" style="--accent:#FF8A5C">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></div>
+            <h4>Trending Ideas</h4><p>Fresh video ideas &amp; hashtags for your niche.</p>
+          </button>
+        </div>
+
+        <h3 class="section-heading">Recent activity</h3>
+        <div class="recent-list" id="dashboard-recent-list">
+          <p class="empty-hint">Nothing yet — generate your first asset above and it'll show up here.</p>
+        </div>
+      </section>
+
+      <!-- TOOL: THUMBNAIL GENERATOR -->
+      <section class="view" id="view-tool-thumb-gen">
+        <div class="tool-header"><h1>Thumbnail Generator</h1><p>Describe your video. Get a detailed, ready-to-design thumbnail concept plus an AI-composited preview.</p></div>
+        <div class="tool-layout">
+          <form class="tool-form" id="form-thumb-gen">
+            <label class="field-label">Video topic / title</label>
+            <input class="field-input" id="thumb-gen-topic" placeholder="e.g. I survived 24 hours in the Arctic" required />
+            <label class="field-label">Niche</label>
+            <select class="field-input" id="thumb-gen-niche">
+              <option>Gaming</option><option>Vlog</option><option>Tech</option><option>Finance</option><option>Education</option><option>Fitness</option><option>Cooking</option><option>Travel</option><option>Comedy</option><option>Beauty</option>
+            </select>
+            <label class="field-label">Mood / style</label>
+            <div class="chip-select" id="thumb-gen-style">
+              <button type="button" class="chip active" data-value="Bold & High-Contrast">Bold</button>
+              <button type="button" class="chip" data-value="Minimal & Clean">Minimal</button>
+              <button type="button" class="chip" data-value="Cinematic & Moody">Cinematic</button>
+              <button type="button" class="chip" data-value="Bright & Colorful">Bright</button>
+              <button type="button" class="chip" data-value="Shocked-face Reaction">Reaction</button>
+            </div>
+            <label class="field-label">Reference image (optional)</label>
+            <div class="upload-zone" id="thumb-gen-upload">
+              <input type="file" id="thumb-gen-file" accept="image/*" hidden />
+              <span class="upload-hint">Click to upload a face/photo to feature</span>
+              <img id="thumb-gen-preview" class="upload-preview hidden" alt="Reference preview" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="thumb-gen-submit">
+              <span class="btn-label">Generate thumbnail concepts</span>
+            </button>
+          </form>
+          <div class="tool-result" id="thumb-gen-result">
+            <div class="result-empty"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M21 19V5c0-1.1-.9-2-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><p>Your thumbnail concepts will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOL: THUMBNAIL ANALYZER -->
+      <section class="view" id="view-tool-thumb-analyze">
+        <div class="tool-header"><h1>Thumbnail Analyzer</h1><p>Upload a thumbnail and get a CTR-focused breakdown with concrete fixes.</p></div>
+        <div class="tool-layout">
+          <form class="tool-form" id="form-thumb-analyze">
+            <label class="field-label">Upload thumbnail</label>
+            <div class="upload-zone large" id="thumb-analyze-upload">
+              <input type="file" id="thumb-analyze-file" accept="image/*" hidden required />
+              <span class="upload-hint">Click or drop an image (JPG/PNG)</span>
+              <img id="thumb-analyze-preview" class="upload-preview hidden" alt="Thumbnail preview" />
+            </div>
+            <label class="field-label">Video title (optional, improves accuracy)</label>
+            <input class="field-input" id="thumb-analyze-title" placeholder="e.g. I built a $1 PC that beats a $1000 PC" />
+            <button type="submit" class="btn btn-primary btn-block" id="thumb-analyze-submit"><span class="btn-label">Analyze thumbnail</span></button>
+          </form>
+          <div class="tool-result" id="thumb-analyze-result">
+            <div class="result-empty"><svg viewBox="0 0 24 24" width="40" height="40"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 5L20.49 19l-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg><p>Your analysis will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOL: TITLE GENERATOR -->
+      <section class="view" id="view-tool-title">
+        <div class="tool-header"><h1>Title Generator</h1><p>Get a batch of scroll-stopping title options for your video.</p></div>
+        <div class="tool-layout">
+          <form class="tool-form" id="form-title">
+            <label class="field-label">What's the video about?</label>
+            <textarea class="field-input" id="title-topic" rows="3" placeholder="e.g. Ranking every flagship phone camera of 2026" required></textarea>
+            <label class="field-label">Tone</label>
+            <div class="chip-select" id="title-tone">
+              <button type="button" class="chip active" data-value="Curiosity-driven">Curiosity</button>
+              <button type="button" class="chip" data-value="Bold & Direct">Bold</button>
+              <button type="button" class="chip" data-value="Funny">Funny</button>
+              <button type="button" class="chip" data-value="Professional">Professional</button>
+              <button type="button" class="chip" data-value="Emotional">Emotional</button>
+            </div>
+            <label class="field-label">Platform</label>
+            <select class="field-input" id="title-platform"><option>YouTube</option><option>TikTok</option><option>Instagram Reels</option><option>Shorts</option></select>
+            <button type="submit" cl
